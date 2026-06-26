@@ -27,13 +27,14 @@ export default async function SettingsPage() {
   // Fetch current month's budget if household exists
   let currentBudget: number | null = null
   const now = new Date()
-  const month = monthKey(now.getFullYear(), now.getMonth() + 1)
+  const currentYear = now.getFullYear()
+  const currentMonth = now.getMonth() + 1
   if (household) {
     const { data: budget } = await supabase
       .from('budgets')
       .select('amount')
       .eq('household_id', household.id)
-      .eq('month', month)
+      .eq('month', monthKey(currentYear, currentMonth))
       .single()
     currentBudget = budget?.amount ?? null
   }
@@ -45,8 +46,9 @@ export default async function SettingsPage() {
       {household && (
         <BudgetSection
           householdId={household.id}
-          month={month}
-          currentBudget={currentBudget}
+          initialYear={currentYear}
+          initialMonth={currentMonth}
+          initialBudget={currentBudget}
         />
       )}
     </div>

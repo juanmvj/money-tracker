@@ -139,6 +139,24 @@ export async function deleteExpense(id: string): Promise<{ error?: string }> {
   return {}
 }
 
+export async function getBudget(
+  householdId: string,
+  month: string,
+): Promise<{ amount: number | null; error?: string }> {
+  const user = await getUser()
+  if (!user) return { amount: null, error: 'Not authenticated' }
+
+  const db = adminClient()
+  const { data } = await db
+    .from('budgets')
+    .select('amount')
+    .eq('household_id', householdId)
+    .eq('month', month)
+    .single()
+
+  return { amount: data?.amount ?? null }
+}
+
 export async function addExpense(
   householdId: string,
   amount: number,
