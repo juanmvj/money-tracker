@@ -1,3 +1,7 @@
+'use client'
+
+import { useState } from 'react'
+
 function fmt(n: number): string {
   return n.toLocaleString('en-US', { style: 'currency', currency: 'USD' })
 }
@@ -9,6 +13,8 @@ export default function BudgetProgress({
   budget: number | null
   spent: number
 }) {
+  const [showPct, setShowPct] = useState(false)
+
   if (!budget) {
     return (
       <div className="bg-white rounded-2xl border border-zinc-200 p-6">
@@ -28,17 +34,32 @@ export default function BudgetProgress({
   const pct = Math.min((spent / budget) * 100, 100)
   const over = spent > budget
 
+  const spentDisplay = showPct
+    ? `${pct.toFixed(1)}%`
+    : fmt(spent)
+
+  const remainingPct = Math.max(100 - (spent / budget) * 100, 0)
+  const remainingDisplay = showPct
+    ? over ? `+${((spent / budget - 1) * 100).toFixed(1)}%` : `${remainingPct.toFixed(1)}%`
+    : fmt(Math.abs(remaining))
+
   return (
     <div className="bg-white rounded-2xl border border-zinc-200 p-6">
       <div className="flex items-baseline justify-between mb-4">
         <div>
           <p className="text-sm text-zinc-500">Spent</p>
-          <p className="text-3xl font-bold text-zinc-900">{fmt(spent)}</p>
+          <button
+            onClick={() => setShowPct(v => !v)}
+            className="text-3xl font-bold text-zinc-900 hover:text-indigo-600 transition-colors cursor-pointer"
+            title={showPct ? 'Show amount' : 'Show percentage'}
+          >
+            {spentDisplay}
+          </button>
         </div>
         <div className="text-right">
           <p className="text-sm text-zinc-500">{over ? 'Over by' : 'Remaining'}</p>
           <p className={`text-3xl font-bold ${over ? 'text-red-600' : 'text-emerald-600'}`}>
-            {fmt(Math.abs(remaining))}
+            {remainingDisplay}
           </p>
         </div>
       </div>
